@@ -20,6 +20,7 @@ BucketOwnerRead = "BucketOwnerRead"
 BucketOwnerFullControl = "BucketOwnerFullControl"
 LogDeliveryWrite = "LogDeliveryWrite"
 
+valid_bucket_names = re.compile(r'^[a-zA-Z0-9-.]+$')
 
 class CorsRules(AWSProperty):
     props = {
@@ -252,6 +253,23 @@ class Bucket(AWSObject):
             if kwargs['AccessControl'] not in self.access_control_types:
                 raise ValueError('AccessControl must be one of "%s"' % (
                     ', '.join(self.access_control_types)))
+
+    def validate_title(self):
+
+        # http://docs.aws.amazon.com/AmazonS3/latest/dev/BucketRestrictions.html
+
+        if self.title.lower() != self.title:
+            raise ValueError('Name "%s" has upper case letters' % self.title)
+        if '..' in self.title:
+            raise ValueError('Name "%s" has multiple periods in a row' % self.title)
+        if 3 > len(self.title) > 63:
+            raise ValueError('Name "%s" must be 3 to 63 characters long' % self.title)
+        if self.title.startswith('.'):
+            raise ValueError('Name "%s" starts with a period' % self.title)
+        if self.title.endswith('.'):
+            raise ValueError('Name "%s" ends with a period' % self.title)
+        if not valid_bucket_names.match(self.title):
+            raise ValueError('Name "%s" not alphanumeric' % self.title)
 
 
 class BucketPolicy(AWSObject):
