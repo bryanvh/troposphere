@@ -3,6 +3,8 @@
 #
 # See LICENSE file for full license.
 
+import re
+
 from . import AWSObject, AWSProperty, Tags
 from .validators import positive_integer, s3_bucket_name
 try:
